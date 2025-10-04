@@ -38,22 +38,23 @@ void isotp_processing_task(void *arg)
 
         if (ISOTP_RET_OK == ret)
         {
+            isotp_buffer_t payload = {.buffer = payload_buf, .length = out_size};
 
-            DBG("task: %s receive_arbitration_id: 0x%02X, send_arbitration_id: 0x%02X", pcTaskGetName(NULL), link_ptr->receive_arbitration_id, link_ptr->send_arbitration_id);
+            // DBG("task: %s receive_arbitration_id: 0x%02lX, send_arbitration_id: 0x%02lX", pcTaskGetName(NULL), link_ptr->receive_arbitration_id, link_ptr->send_arbitration_id);
 
-            switch (link_ptr->send_arbitration_id)
+            if (isotp_link_container == &isotp_link_containers[CMD_LINK_CHANNEL])
             {
-            case GET_NODE_CAN_ADDRESS(PROTO_MSG_TRANFER_RX_ID, CO_DEVICE_PEREPHERIAL_CONTROLLER):
-                // TODO: Add Handler for proto messages
-                DBG("task: %s Received ISO-TP message of PROTO_MSG_TRANFER_RX_ID with length: %u", pcTaskGetName(NULL), out_size);
-                break;
-            case GET_NODE_CAN_ADDRESS(FILE_TRANFER_RX_ID, CO_DEVICE_PEREPHERIAL_CONTROLLER):
-                // TODO: Add file writer for buffers
-                DBG("task: %s Received ISO-TP message of FILE_TRANFER_RX_ID with length: %u", pcTaskGetName(NULL), out_size);
-                break;
-            default:
+                // DBG("task: %s Received ISO-TP message by PROTO_MSG_TRANFER_RX_ID with length: %u", pcTaskGetName(NULL), out_size);
+                xQueueSend(handle_ecosystem_cmd_buffer, &payload, 1000);
+            }
+            else if (isotp_link_container == &isotp_link_containers[FILE_TRANSFER_LINK_CHANNEL])
+            {
+                // DBG("task: %s Received ISO-TP message by FILE_TRANSFER_LINK_CHANNEL with length: %u", pcTaskGetName(NULL), out_size);
+                xQueueSend(handle_ecosystem_file_transfer_buffer, &payload, 10);
+            }
+            else
+            {
                 DBG("task: %s INCORREC LINKING", pcTaskGetName(NULL));
-                break;
             }
         }
         vTaskDelay(0);

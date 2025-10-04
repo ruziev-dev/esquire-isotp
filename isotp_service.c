@@ -9,6 +9,8 @@
 #include "isotp_tasks.h"
 #include "task_priorities.h"
 #include "messages.h"
+#include "isotp.h"
+#include "isotp_link_containers.h"
 
 #include "can.h"
 
@@ -45,7 +47,6 @@ void IsoTpService_Run(uint8_t NodeId)
     HAL_CAN_Start(&hcan1);
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY);
 
-
     // ISO-TP handler + tasks
     configure_isotp_links(NodeId);
     xSemaphoreGive(isotp_send_queue_sem);
@@ -59,4 +60,10 @@ void IsoTpService_Run(uint8_t NodeId)
     xTaskCreate(can_receive_task, "CAN_rx", configMINIMAL_STACK_SIZE, NULL, RX_TASK_PRIO, NULL);
     xTaskCreate(can_transmit_task, "CAN_tx", configMINIMAL_STACK_SIZE, NULL, TX_TASK_PRIO, NULL);
     xTaskCreate(isotp_send_queue_task, "isotp", configMINIMAL_STACK_SIZE, NULL, MAIN_TSK_PRIO, NULL);
+}
+
+int sendIsoTpCmdChannel(uint8_t *payload, uint16_t size)
+{
+
+    return isotp_send(&isotp_link_containers[CMD_LINK_CHANNEL].link, payload, size);
 }

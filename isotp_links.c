@@ -35,10 +35,10 @@ void configure_isotp_links(uint8_t NodeId)
     xSemaphoreTake(isotp_mutex, (TickType_t)100);
 
     // Proto Messages communication
-    configure_isotp_link(0, GET_NODE_CAN_ADDRESS(PROTO_MSG_TRANFER_RX_ID, NodeId), GET_NODE_CAN_ADDRESS(PROTO_MSG_TRANFER_TX_ID, NodeId), "cmd");
+    configure_isotp_link(CMD_LINK_CHANNEL, GET_NODE_CAN_ADDRESS(PROTO_MSG_TRANFER_RX_ID, NodeId), GET_NODE_CAN_ADDRESS(PROTO_MSG_TRANFER_TX_ID, NodeId), "cmd");
 
     // Big buffers tranfers (for files, configs, firmware updates)
-    configure_isotp_link(1, GET_NODE_CAN_ADDRESS(FILE_TRANFER_RX_ID, NodeId), GET_NODE_CAN_ADDRESS(FILE_TRANFER_TX_ID, NodeId), "file");
+    configure_isotp_link(FILE_TRANSFER_LINK_CHANNEL, GET_NODE_CAN_ADDRESS(FILE_TRANFER_RX_ID, NodeId), GET_NODE_CAN_ADDRESS(FILE_TRANFER_TX_ID, NodeId), "file");
 
     // configure_isotp_link(1, 0x7E9, 0x7E1, "tcu");
 
